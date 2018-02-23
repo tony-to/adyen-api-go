@@ -31,7 +31,22 @@ const (
 
 	// CheckoutAPIVersion - API version of current checkout API
 	CheckoutAPIVersion = "v32"
+
+	// LogDisabled - logging is disabled
+	LogDisabled = 0
+
+	// LogErrorOnly - log level: errors only
+	LogErrorOnly = 1
+
+	// LogErrorInfo - log level: errors and informational
+	LogErrorInfo = 2
+
+	// LogErrorInfoDebug - log level: errors, informational and debug
+	LogErrorInfoDebug = 3
 )
+
+// LogLevel - Default library log level
+var LogLevel = LogErrorInfo
 
 // Adyen - base structure with configuration options
 //
@@ -168,7 +183,9 @@ func (a *Adyen) execute(url string, requestEntity interface{}) (*Response, error
 		return nil, err
 	}
 
-	a.Logger.Printf("[Request]: %s\n%s", url, body)
+	if LogLevel > 2 {
+		a.Logger.Printf("[Request]: %s\n%s", url, body)
+	}
 
 	req.Header.Set("Content-Type", "application/json")
 	req.SetBasicAuth(a.Credentials.Username, a.Credentials.Password)
@@ -179,7 +196,9 @@ func (a *Adyen) execute(url string, requestEntity interface{}) (*Response, error
 	}
 	defer func() {
 		if closeErr := resp.Body.Close(); closeErr != nil {
-			a.Logger.Print(closeErr)
+			if LogLevel > 0 {
+				a.Logger.Print(closeErr)
+			}
 		}
 	}()
 
@@ -188,7 +207,9 @@ func (a *Adyen) execute(url string, requestEntity interface{}) (*Response, error
 		return nil, err
 	}
 
-	a.Logger.Printf("[Response]: %s\n%s", url, buf.String())
+	if LogLevel > 2 {
+		a.Logger.Printf("[Response]: %s\n%s", url, buf.String())
+	}
 
 	providerResponse := &Response{
 		Response: resp,
@@ -211,7 +232,9 @@ func (a *Adyen) executeHpp(url string, requestEntity interface{}) (*Response, er
 		return nil, err
 	}
 
-	a.Logger.Printf("[Request]: %s", url)
+	if LogLevel > 2 {
+		a.Logger.Printf("[Request]: %s", url)
+	}
 
 	resp, err := a.client.Do(req)
 
@@ -221,7 +244,9 @@ func (a *Adyen) executeHpp(url string, requestEntity interface{}) (*Response, er
 
 	defer func() {
 		if closeErr := resp.Body.Close(); closeErr != nil {
-			a.Logger.Print(closeErr)
+			if LogLevel > 0 {
+				a.Logger.Print(closeErr)
+			}
 		}
 	}()
 
@@ -230,7 +255,9 @@ func (a *Adyen) executeHpp(url string, requestEntity interface{}) (*Response, er
 		return nil, err
 	}
 
-	a.Logger.Printf("[Response]: %s\n%s", url, buf.String())
+	if LogLevel > 2 {
+		a.Logger.Printf("[Response]: %s\n%s", url, buf.String())
+	}
 
 	providerResponse := &Response{
 		Response: resp,
