@@ -31,8 +31,8 @@ type Address struct {
 
 // Amount value/currency representation
 type Amount struct {
-	Value    float32 `json:"value"`
-	Currency string  `json:"currency"`
+	Value    int64  `json:"value"`
+	Currency string `json:"currency"`
 }
 
 /*******
